@@ -1,6 +1,7 @@
 package com.swd.observer;
 
 import android.app.Application;
+import android.content.Context;
 
 /**
  * Created by Ryan on 9/24/2017.
@@ -8,19 +9,22 @@ import android.app.Application;
 
 public class App extends Application
 {
-    public static MainActivity Context;
-    //region Properties
-    public static MainActivity getContext() {
-        return Context;
-    }
+    private static App instance;
 
-    public static void setContext(MainActivity context) {
-        Context = context;
-    }
-    //endregion
-
-    public ConfigManager()
+    public static App getInstance()
     {
-        this.Context = null;
+        return instance;
+    }
+
+    public static Context getContext()
+    {
+        return instance.getApplicationContext();
+    }
+
+    @Override
+    public void onCreate()
+    {
+        instance = this;
+        super.onCreate();
     }
 }

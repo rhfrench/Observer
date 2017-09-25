@@ -1,17 +1,24 @@
-package com.swd.observer;
+package Service;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.HandlerThread;
-import java.util.Date;
-import java.util.Scanner;
-import java.util.*;
-import android.location.Criteria;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 
+import java.util.Date;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import com.swd.observer.App;
+
+import Models.EventType;
 
 
 /**
@@ -21,15 +28,34 @@ import android.location.Criteria;
 public class LocationLogger implements LocationListener, ILocationLogger
 {
     public String DeviceID;
+    public long LogInterval;
     public Location LastSavedLoc;
     public Date LastSavedLogTime;
     public Date OverrideLogTime;
+    public EventType EventType;
     private HandlerThread handlerThread;
     private final LocationManager locMngr;
     private final String locProvider;
     private final Criteria locCriteria;
 
     //region Properties
+
+    public Models.EventType getEventType() {
+        return EventType;
+    }
+
+    public void setEventType(Models.EventType eventType) {
+        EventType = eventType;
+    }
+
+    public long getLogInterval() {
+        return LogInterval;
+    }
+
+    public void setLogInterval(long locInterval) {
+        LogInterval = locInterval;
+    }
+
     public Date getOverrideLogTime() {
         return OverrideLogTime;
     }
@@ -68,7 +94,7 @@ public class LocationLogger implements LocationListener, ILocationLogger
     //region Constructor
     public LocationLogger()
     {
-        this.locMngr = (LocationManager)App.getContext().getSystemService(Context.LOCATION_SERVICE);
+        this.locMngr = (LocationManager) App.getContext().getSystemService(Context.LOCATION_SERVICE);
         Criteria criteriaForLocationService = new Criteria();
         criteriaForLocationService.setAccuracy(Criteria.ACCURACY_FINE);
         this.locCriteria = criteriaForLocationService;
@@ -105,19 +131,49 @@ public class LocationLogger implements LocationListener, ILocationLogger
     @Override
     public void RequestSingleLocationUpdate()
     {
-
+        //Run single updates on main looper
+        if (ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            this.locMngr.requestSingleUpdate(this.locCriteria, this, null);
     }
 
     @Override
     public void StartRequestingUpdates()
     {
+        long interval;
 
+        if (ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            interval = TimeUnit.MILLISECONDS.toMinutes(this.LogInterval);
+            EventType = EventType.Log;
+            this.locMngr.removeUpdates(this);
+            if (this.handlerThread != null)
+            {
+                this.handlerThread.quit();
+                this.handlerThread = null;
+            }
+
+            this.handlerThread = new HandlerThread("LocationLoggerThread", 0);//TODO: research android's thread priority enum
+        }
+    }
+
+    private String GetID()
+    {
+        String ID = "";
+        if (ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
+            ID = Settings.Secure.getString(App.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        return ID;
     }
 
     @Override
     public void StopUpdates()
     {
         this.locMngr.removeUpdates(this);
-
+        if (this.handlerThread != null)
+        {
+            this.handlerThread.quit();
+            this.handlerThread.interrupt();
+            this.handlerThread = null;
+        }
     }
 }
