@@ -1,4 +1,4 @@
-package Models;
+package com.swd.observer.models;
 
 /**
  * Created by Ryan on 9/24/2017.

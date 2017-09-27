@@ -1,4 +1,4 @@
-package Service;
+package com.swd.observer.util;
 
 /**
  * Created by Ryan on 9/24/2017.

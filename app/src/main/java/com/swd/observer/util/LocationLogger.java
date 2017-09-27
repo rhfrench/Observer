@@ -1,4 +1,4 @@
-package Service;
+package com.swd.observer.util;
 
 import android.Manifest;
 import android.content.Context;
@@ -13,12 +13,14 @@ import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 
 import java.util.Date;
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.swd.observer.App;
+import com.swd.observer.di.AppModule;
+import com.swd.observer.models.EventType;
 
-import Models.EventType;
+import javax.inject.Inject;
 
 
 /**
@@ -40,11 +42,11 @@ public class LocationLogger implements LocationListener, ILocationLogger
 
     //region Properties
 
-    public Models.EventType getEventType() {
+    public com.swd.observer.models.EventType getEventType() {
         return EventType;
     }
 
-    public void setEventType(Models.EventType eventType) {
+    public void setEventType(com.swd.observer.models.EventType eventType) {
         EventType = eventType;
     }
 
@@ -91,10 +93,13 @@ public class LocationLogger implements LocationListener, ILocationLogger
     //endregion
 
 
+    @Inject
+    Context context;
+
     //region Constructor
     public LocationLogger()
     {
-        this.locMngr = (LocationManager) App.getContext().getSystemService(Context.LOCATION_SERVICE);
+        this.locMngr = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteriaForLocationService = new Criteria();
         criteriaForLocationService.setAccuracy(Criteria.ACCURACY_FINE);
         this.locCriteria = criteriaForLocationService;
@@ -132,7 +137,7 @@ public class LocationLogger implements LocationListener, ILocationLogger
     public void RequestSingleLocationUpdate()
     {
         //Run single updates on main looper
-        if (ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             this.locMngr.requestSingleUpdate(this.locCriteria, this, null);
     }
 
@@ -141,7 +146,7 @@ public class LocationLogger implements LocationListener, ILocationLogger
     {
         long interval;
 
-        if (ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             interval = TimeUnit.MILLISECONDS.toMinutes(this.LogInterval);
             EventType = EventType.Log;
@@ -159,8 +164,8 @@ public class LocationLogger implements LocationListener, ILocationLogger
     private String GetID()
     {
         String ID = "";
-        if (ContextCompat.checkSelfPermission(App.getContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
-            ID = Settings.Secure.getString(App.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
+            ID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         return ID;
     }
