@@ -16,8 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.swd.observer.App;
-import com.swd.observer.di.AppModule;
 import com.swd.observer.models.EventType;
 
 import javax.inject.Inject;

@@ -1,4 +1,4 @@
-package com.swd.observer;
+package com.swd.observer.application;
 
 import android.app.Application;
 import com.swd.observer.di.AppComponent;
