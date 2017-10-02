@@ -12,6 +12,7 @@ import android.os.HandlerThread;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -112,8 +113,20 @@ public class LocationLogger implements LocationListener, ILocationLogger
 
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
+        if (location != null)
+        {
+            this.LastSavedLoc = location;
+            this.LastSavedLogTime = new Date();
+            if (this.OverrideLogTime != new Date(Long.MIN_VALUE))
+                this.LastSavedLogTime = this.OverrideLogTime;
+            else
+                this.LastSavedLogTime = new Date();
 
+            this.DeviceID = GetID();
+            //TODO communicate with service that location has been saved. Service should handle DB insert.
+        }
     }
 
     @Override

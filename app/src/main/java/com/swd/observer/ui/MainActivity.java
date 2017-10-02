@@ -1,5 +1,6 @@
 package com.swd.observer.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,9 +29,11 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });*/
+        Intent intent = new Intent(MainActivity.this, TestActivity.class);
+        startActivity(intent);
     }
 
-   private void StartServices()
+   private void startServices()
    {
 
    }

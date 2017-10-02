@@ -11,7 +11,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Ryan on 9/28/2017.
  */
 
-public class AppRxSchedulers implements  RxSchedulers
+public class AppRxSchedulers implements  IRxSchedulers
 {
     public static Executor backgroundExecutor = Executors.newCachedThreadPool();
     public static Scheduler BACKGROUND_SCHEDULERS = Schedulers.from(backgroundExecutor);
@@ -41,5 +41,10 @@ public class AppRxSchedulers implements  RxSchedulers
     @Override
     public Scheduler internet() {
         return INTERNET_SCHEDULERS;
+    }
+
+    @Override
+    public Scheduler newThread() {
+        return Schedulers.newThread();
     }
 }
