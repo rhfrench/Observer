@@ -12,7 +12,6 @@ import android.os.HandlerThread;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
